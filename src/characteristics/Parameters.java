@@ -21,7 +21,7 @@ public class Parameters {
   //-----------------------//
   //---TEAM-A-PARAMETERS---//
   //-----------------------//
-  public static final String teamAName = "Plop TEAM";
+  public static final String teamAName = "Attack";
   public static final String teamAMainBotBrainClassName = "algorithms.BrainMain"; //class given by name; is supposed to extends robotsimulator.Brain
   public static final String teamAMainBotAvatar = "avatars/cyclope.png"; //path relative to location of ant build.xml file
   public static final double teamAMainBotRadius = 50, //1 unit = 1mm, body radius
@@ -58,8 +58,8 @@ public class Parameters {
   //-----------------------//
   //---TEAM-B-PARAMETERS---//
   //-----------------------//
-  public static final String teamBName = "FLOP Team";
-  public static final String teamBMainBotBrainClassName = "algorithms.BrainMain"; //class given by name; is supposed to extends robotsimulator.Brain
+  public static final String teamBName = "Defense";
+  public static final String teamBMainBotBrainClassName = "algorithms.DefenseMain"; //class given by name; is supposed to extends robotsimulator.Brain
   public static final String teamBMainBotAvatar = "avatars/bogoss.png"; //path relative to location of ant build.xml file
   public static final double teamBMainBotRadius = 50, //1 unit = 1mm, body radius
                              teamBMainBotFrontalDetectionRange = 500, //1 unit = 1mm, range of frontal sensor
