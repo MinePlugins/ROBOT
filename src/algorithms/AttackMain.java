@@ -81,7 +81,7 @@ public class AttackMain extends Brain {
 
     //DEBUG MESSAGE
     if (whoAmI == ROCKY) {
-        sendLogMessage("#ROCKY *thinks* he is rolling at position ("+(int)myX+", "+(int)myY+").");
+        sendLogMessage("#ROCKY *thinks* he is rolling at position ("+(int)myX+", "+(int)myY+"). State ="+state+". Objet:"+detectFront().getObjectType());
     }
 
     //---AUTOMATON DEPLACEMENT---//
@@ -93,27 +93,25 @@ public class AttackMain extends Brain {
 
     if (state==TURNNORTHTASK && !(isSameDirection(getHeading(),Parameters.NORTH))) {
         stepTurn(Parameters.Direction.LEFT);
-        sendLogMessage("Turning North!");
         return;
       }
 
       if (state==TURNNORTHTASK && (isSameDirection(getHeading(),Parameters.NORTH))) {
         state = MOVENORTHTASK;
         myMove();
-        sendLogMessage("Heading North!");
         return;
       }
 
       if (state==MOVENORTHTASK && detectFront().getObjectType()!=IFrontSensorResult.Types.WALL) {
-        myMove(); //And what to do when blind blocked?
-        sendLogMessage("No obstacles North!");
+        myMove();
+        sendLogMessage("herre");
         return;
       }
+      
       if (state==MOVENORTHTASK && detectFront().getObjectType()==IFrontSensorResult.Types.WALL) {
         state=TURNEASTTASK;
         oldAngle=getHeading();
         stepTurn(Parameters.Direction.RIGHT);
-        sendLogMessage("Turning East!");
         return;
       }
 
