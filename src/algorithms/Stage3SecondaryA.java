@@ -157,6 +157,7 @@ public class Stage3SecondaryA extends Brain {
       return;
     }
     if (true) {
+      System.out.println("ok")
       return;
     }
   }
