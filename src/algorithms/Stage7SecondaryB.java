@@ -30,7 +30,9 @@ public class Stage7SecondaryB extends Brain {
   private static final int TURNLEFTTASK = 1;
   private static final int MOVETASK = 2;
   private static final int TURNRIGHTTASK = 3;
+  private static final int LATERALINVERSE = 4;
   private static final int SINK = 0xBADC0DE1;
+  
 
   //---VARIABLES---//
   private int state;
@@ -95,8 +97,11 @@ if (freeze) return;
         // on va définir son positionnemente t sa façon de bouger 
     if (whoAmI == ROCKY && state==MOVETASK && detectFront().getObjectType()==IFrontSensorResult.Types.NOTHING){
       if ((int)myX <=500 ){
+        for (IRadarResult o: detectRadar()){
+        System.out.println(o.getObjectDistance());
+        }
         System.out.println("ici");
-        
+        state=LATERALINVERSE;
         //on repart a droite
       }else if((int)myX >=2810){
         // on repart a gauche
@@ -107,7 +112,15 @@ if (freeze) return;
       return;
 
     }
-    
+    if(state==LATERALINVERSE && whoAmI == ROCKY){
+      stepTurn(Parameters.Direction.RIGHT);
+      move();
+      return;
+    }
+    if(state==LATERALINVERSE && whoAmI != ROCKY){
+      move();
+      return;
+    }
     if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),Parameters.NORTH))) {
       stepTurn(Parameters.Direction.LEFT);
       //sendLogMessage("Initial TeamA Secondary Bot1 position. Heading North!");
