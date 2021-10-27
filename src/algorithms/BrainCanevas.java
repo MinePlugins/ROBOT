@@ -115,8 +115,8 @@ public class BrainCanevas extends Brain {
       state=TURNAROUND;
       oldAngle=getHeading();
       tourne=true;
-      System.out.print("YOLOLOLO : " + (oldAngle + Parameters.RIGHTTURNFULLANGLE) + "\n");
-      System.out.print("YOLOLOLO : " + myX + "\n");
+      //System.out.print("YOLOLOLO : " + (oldAngle + Parameters.RIGHTTURNFULLANGLE) + "\n");
+      //System.out.print("YOLOLOLO : " + myX + "\n");
 
       stepTurn(Parameters.Direction.RIGHT);
     }

@@ -74,7 +74,7 @@ public class Stage7MainB extends Brain {
     state=TURNSOUTHTASK;
     isMoving=false;
     fireOrder=false;
-    fireRythm=0;
+    fireRythm=150;
     oldAngle=myGetHeading();
     targetX=1500;
     targetY=1000;
@@ -112,12 +112,13 @@ public class Stage7MainB extends Brain {
         double enemyY=myY+o.getObjectDistance()*Math.sin(o.getObjectDirection());
         broadcast(whoAmI+":"+TEAM+":"+FIRE+":"+enemyX+":"+enemyY+":"+OVER);
       }
-      if (o.getObjectDistance()<=100 && !isRoughlySameDirection(o.getObjectDirection(),getHeading()) && o.getObjectType()!=IRadarResult.Types.BULLET) {
+      if (o.getObjectDistance()<=100 && !isRoughlySameDirection(o.getObjectDirection(),getHeading())) {
         freeze=true;
       }
       if (o.getObjectType()==IRadarResult.Types.TeamMainBot || o.getObjectType()==IRadarResult.Types.TeamSecondaryBot || o.getObjectType()==IRadarResult.Types.Wreck) {
         if (fireOrder && onTheWay(o.getObjectDirection())) {
           friendlyFire=false;
+          fireOrder=false;
         }
       }
     }
@@ -125,14 +126,16 @@ public class Stage7MainB extends Brain {
 
     //AUTOMATON
     if (fireOrder) countDown++;
-    if (countDown>=100) fireOrder=false;
-    if (fireOrder && fireRythm==0 && friendlyFire) {
+    if (countDown>=10000) fireOrder=false;
+    if (fireOrder && friendlyFire) {
+      // ne prend que 1 des 2 ordres
+      fireRythm*=1000;
       firePosition(targetX,targetY);
-      fireRythm++;
+      
       return;
     }
-    fireRythm++;
-    if (fireRythm>=Parameters.bulletFiringLatency) fireRythm=0;
+    fireRythm*=1000;
+    //if (fireRythm>=Parameters.bulletFiringLatency) fireRythm=150;
     if (state==TURNSOUTHTASK && !(isSameDirection(getHeading(),Parameters.NORTH))) {
       stepTurn(Parameters.Direction.RIGHT);
       return;
@@ -159,22 +162,6 @@ public class Stage7MainB extends Brain {
     if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE)) {
       state=MOVETASK;
       myMove();
-      return;
-    }
-
-
-
-    if (state==0xB52){
-      if (fireRythm==0) {
-        firePosition(700,1500);
-        fireRythm++;
-        return;
-      }
-      fireRythm++;
-      if (fireRythm==Parameters.bulletFiringLatency) fireRythm=0;
-      if (rythm==0) stepTurn(Parameters.Direction.LEFT); else myMove();
-      rythm++;
-      if (rythm==14) rythm=0;
       return;
     }
 
@@ -206,11 +193,11 @@ public class Stage7MainB extends Brain {
     return Math.abs(normalizeRadian(dir1)-normalizeRadian(dir2))<FIREANGLEPRECISION;
   }
   private void process(String message){
-    if (Integer.parseInt(message.split(":")[2])==FIRE) {
+    targetX=Double.parseDouble(message.split(":")[3]);
+    targetY=Double.parseDouble(message.split(":")[4]);
+    if (Integer.parseInt(message.split(":")[2])==FIRE && Math.abs(myX-targetX)<=700 && Math.abs(myY-targetY)<=700) {
       fireOrder=true;
       countDown=0;
-      targetX=Double.parseDouble(message.split(":")[3]);
-      targetY=Double.parseDouble(message.split(":")[4]);
     }
   }
   private void firePosition(double x, double y){

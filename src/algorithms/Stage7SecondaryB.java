@@ -39,6 +39,7 @@ public class Stage7SecondaryB extends Brain {
   private boolean isMoving;
   private boolean freeze;
   private int whoAmI;
+  private int NO = 0;
 
   //---CONSTRUCTORS---//
   public Stage7SecondaryB() { super(); }
@@ -50,11 +51,11 @@ public class Stage7SecondaryB extends Brain {
     for (IRadarResult o: detectRadar())
       if (isSameDirection(o.getObjectDirection(),Parameters.NORTH)) whoAmI=UNDEFINED;
     if (whoAmI == ROCKY){
-      myX=Parameters.teamASecondaryBot1InitX;
-      myY=Parameters.teamASecondaryBot1InitY;
+      myX=Parameters.teamBSecondaryBot1InitX;
+      myY=Parameters.teamBSecondaryBot1InitY;
     } else {
-      myX=Parameters.teamASecondaryBot2InitX;
-      myY=Parameters.teamASecondaryBot2InitY;
+      myX=Parameters.teamBSecondaryBot2InitX;
+      myY=Parameters.teamBSecondaryBot2InitY;
     }
 
     //INIT
@@ -80,14 +81,33 @@ public class Stage7SecondaryB extends Brain {
         double enemyX=myX+o.getObjectDistance()*Math.cos(o.getObjectDirection());
         double enemyY=myY+o.getObjectDistance()*Math.sin(o.getObjectDirection());
         broadcast(whoAmI+":"+TEAM+":"+FIRE+":"+enemyX+":"+enemyY+":"+OVER);
+      }else{
+        double enemyX=myX+o.getObjectDistance()*Math.cos(o.getObjectDirection());
+        double enemyY=myY+o.getObjectDistance()*Math.sin(o.getObjectDirection());
+        broadcast(whoAmI+":"+TEAM+":"+NO+":"+enemyX+":"+enemyY+":"+OVER);
       }
       if (o.getObjectDistance()<=100) {
         freeze=true;
       }
     }
-    if (freeze) return;
-
+if (freeze) return;
     //AUTOMATON
+        // on va définir son positionnemente t sa façon de bouger 
+    if (whoAmI == ROCKY && state==MOVETASK && detectFront().getObjectType()==IFrontSensorResult.Types.NOTHING){
+      if ((int)myX <=500 ){
+        System.out.println("ici");
+        
+        //on repart a droite
+      }else if((int)myX >=2810){
+        // on repart a gauche
+        System.out.println("la");
+      }else{
+        myMove();
+      }
+      return;
+
+    }
+    
     if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),Parameters.NORTH))) {
       stepTurn(Parameters.Direction.LEFT);
       //sendLogMessage("Initial TeamA Secondary Bot1 position. Heading North!");
@@ -111,6 +131,7 @@ public class Stage7SecondaryB extends Brain {
       //sendLogMessage("Iceberg at 12 o'clock. Heading 3!");
       return;
     }
+
     if (state==TURNRIGHTTASK && !(isSameDirection(getHeading(),oldAngle+Parameters.RIGHTTURNFULLANGLE))) {
       stepTurn(Parameters.Direction.RIGHT);
       //sendLogMessage("Iceberg at 12 o'clock. Heading 3!");
