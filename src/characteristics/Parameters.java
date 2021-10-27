@@ -25,9 +25,9 @@ public class Parameters {
   public static final String teamAMainBotBrainClassName = "algorithms.Stage6MainA"; //class given by name; is supposed to extends robotsimulator.Brain
   public static final String teamAMainBotAvatar = "avatars/cyclope.png"; //path relative to location of ant build.xml file
   public static final double teamAMainBotRadius = 50, //1 unit = 1mm, body radius
-                             teamAMainBotFrontalDetectionRange = 500, //1 unit = 1mm, range of frontal sensor
+                             teamAMainBotFrontalDetectionRange = 300, //1 unit = 1mm, range of frontal sensor
                              teamAMainBotFrontalDetectionAngle = 0, //UNUSED AT THE MOMENT, frontal sensor detection angle is suppoed to be absolute
-                             teamAMainBotSpeed = 2, //1 unit = 1mm, distance performed at step movement
+                             teamAMainBotSpeed = 1, //1 unit = 1mm, distance performed at step movement
                              teamAMainBotStepTurnAngle = 0.01*Math.PI, //trigonometric unit, angle performed at step turn action
                              teamAMainBotHealth = 300, //FICTIONAL SIMOVIES
                              teamAMainBot1InitX = 200, //1 unit = 1mm, coordinate of central point
@@ -43,7 +43,7 @@ public class Parameters {
   public static final String teamASecondaryBotBrainClassName = "algorithms.Stage3SecondaryA"; //class given by name; is supposed to extends robotsimulator.Brain
   public static final String teamASecondaryBotAvatar = "avatars/clumpsy.png"; //path relative to location of ant build.xml file
   public static final double teamASecondaryBotRadius = 50, //1 unit = 1mm, body radius
-                             teamASecondaryBotFrontalDetectionRange = 500, //1 unit = 1mm, range of frontal sensor
+                             teamASecondaryBotFrontalDetectionRange = 100, //1 unit = 1mm, range of frontal sensor - OG : 500
                              teamASecondaryBotFrontalDetectionAngle = 0, //UNUSED AT THE MOMENT, frontal sensor detection angle is suppoed to be absolute
                              teamASecondaryBotSpeed = 3, //1 unit = 1mm, distance performed at step movement
                              teamASecondaryBotStepTurnAngle = 0.01*Math.PI, //trigonometric unit, angle performed at step turn action
@@ -59,25 +59,25 @@ public class Parameters {
   //---TEAM-B-PARAMETERS---//
   //-----------------------//
   public static final String teamBName = "Defense";
-  public static final String teamBMainBotBrainClassName = "algorithms.DefenseMain"; //class given by name; is supposed to extends robotsimulator.Brain
-  public static final String teamBMainBotAvatar = "avatars/bogoss.png"; //path relative to location of ant build.xml file
+  public static final String teamBMainBotBrainClassName = "algorithms.Stage7MainB"; //class given by name; is supposed to extends robotsimulator.Brain
+  public static final String teamBMainBotAvatar = "avatars/hollowee.png"; //path relative to location of ant build.xml file
   public static final double teamBMainBotRadius = 50, //1 unit = 1mm, body radius
-                             teamBMainBotFrontalDetectionRange = 500, //1 unit = 1mm, range of frontal sensor
+                             teamBMainBotFrontalDetectionRange = 300, //1 unit = 1mm, range of frontal sensor
                              teamBMainBotFrontalDetectionAngle = 0, //UNUSED AT THE MOMENT, frontal sensor detection angle is suppoed to be absolute
                              teamBMainBotSpeed = 1, //1 unit = 1mm, distance performed at step movement
                              teamBMainBotStepTurnAngle = 0.01*Math.PI, //trigonometric unit, angle performed at step turn action
                              teamBMainBotHealth = 300, //FICTIONAL SIMOVIES
                              teamBMainBot1InitX = 2800, //1 unit = 1mm, coordinate of central point
                              teamBMainBot1InitY = 800, //1 unit = 1mm, coordinate of central point
-                             teamBMainBot1InitHeading = NORTH, //clockwise trigonometric unit, according to screen pixel coordinate reference
+                             teamBMainBot1InitHeading = WEST, //clockwise trigonometric unit, according to screen pixel coordinate reference
                              teamBMainBot2InitX = 2800, //1 unit = 1mm, coordinate of central point
                              teamBMainBot2InitY = 1000, //1 unit = 1mm, coordinate of central point
-                             teamBMainBot2InitHeading = NORTH, //clockwise trigonometric unit, according to screen pixel coordinate reference
+                             teamBMainBot2InitHeading = WEST, //clockwise trigonometric unit, according to screen pixel coordinate reference
                              teamBMainBot3InitX = 2800, //1 unit = 1mm, coordinate of central point
                              teamBMainBot3InitY = 1200, //1 unit = 1mm, coordinate of central point
-                             teamBMainBot3InitHeading = NORTH; //clockwise trigonometric unit, according to screen pixel coordinate reference
+                             teamBMainBot3InitHeading = WEST; //clockwise trigonometric unit, according to screen pixel coordinate reference
 
-  public static final String teamBSecondaryBotBrainClassName = "algorithms.CampBot"; //class given by name; is supposed to extends robotsimulator.Brain
+  public static final String teamBSecondaryBotBrainClassName = "algorithms.Stage7SecondaryB"; //class given by name; is supposed to extends robotsimulator.Brain
   public static final String teamBSecondaryBotAvatar = "avatars/fannyExplorer.png"; //path relative to location of ant build.xml file
   public static final double teamBSecondaryBotRadius = 50, //1 unit = 1mm, body radius
                              teamBSecondaryBotFrontalDetectionRange = 500, //1 unit = 1mm, range of frontal sensor
@@ -87,11 +87,10 @@ public class Parameters {
                              teamBSecondaryBotHealth = 100, //FICTIONAL SIMOVIES
                              teamBSecondaryBot1InitX = 2500, //1 unit = 1mm, coordinate of central point
                              teamBSecondaryBot1InitY = 800, //1 unit = 1mm, coordinate of central point
-                             teamBSecondaryBot1InitHeading = NORTH, //clockwise trigonometric unit, according to screen pixel coordinate reference
+                             teamBSecondaryBot1InitHeading = WEST, //clockwise trigonometric unit, according to screen pixel coordinate reference
                              teamBSecondaryBot2InitX = 2500, //1 unit = 1mm, coordinate of central point
                              teamBSecondaryBot2InitY = 1200, //1 unit = 1mm, coordinate of central point
-                             teamBSecondaryBot2InitHeading = NORTH; //clockwise trigonometric unit, according to screen pixel coordinate reference
-  
+                             teamBSecondaryBot2InitHeading = WEST; //clockwise trigonometric unit, according to screen pixel coordinate reference
   //-----------------------//
   //---BULLET-PARAMETERS---//
   //-----------------------//
