@@ -22,9 +22,13 @@ public class AttackMain extends Brain {
   private static final int MOVEEASTTASK = 4;
   private static final int TURNNORTHTASK = 5;
   private static final int MOVENORTHTASK = 6;
-  private static final int TURNSOUTHBISTASK = 51;
   private static final int SWINGTASK = 7;
+  private static final int LOOP = 8;  
+  private static final int TURNSOUTHBISTASK = 51;
+
   private static final int FREEZE = -1;
+
+  
   private static final int SINK = 0xBADC0DE1;
 
   //variables d'etats du comportement
@@ -40,6 +44,7 @@ public class AttackMain extends Brain {
   private int whoAmI;
   private int mode;
   private String target;
+  private boolean initRunner;
 
   //---CONSTRUCTORS---//
   public AttackMain() { super(); }
@@ -64,6 +69,7 @@ public class AttackMain extends Brain {
     isMoving=false;
     oldAngle=getHeading();
     target = "base";
+    initRunner=true;
   }
 
   private void myMove(){
@@ -78,44 +84,95 @@ public class AttackMain extends Brain {
       myY+=Parameters.teamASecondaryBotSpeed*Math.sin(getHeading());
       isMoving=false;
      }
-
+    
+    
     //DEBUG MESSAGE
     if (whoAmI == ROCKY) {
         sendLogMessage("#ROCKY *thinks* he is rolling at position ("+(int)myX+", "+(int)myY+"). State ="+state+". Objet:"+detectFront().getObjectType());
+        if(mode == RUNNER){
+        	
+        	//Sila prochaine dest est la base
+            if(target == "base"){
+            	if(initRunner) {
+            		state = TURNNORTHTASK;
+            		initRunner=false;
+            		System.out.println("On doit aller vers le nord");
+            	}
+            	
+        	}else if(target == "objectif") {
+        		state = TURNSOUTHTASK;
+        		initRunner=false;
+        }
+        }
+        
+        if (state==TURNNORTHTASK && !(isSameDirection(getHeading(),Parameters.NORTH))) {
+            stepTurn(Parameters.Direction.LEFT);
+            System.out.println("On tourne vers le nord");
+            return;
+          }
+
+          if (state==TURNNORTHTASK && (isSameDirection(getHeading(),Parameters.NORTH))) {
+            state = MOVENORTHTASK;
+            System.out.println("On est vers le nord");
+            myMove();
+            return;
+          }
+
+          if (state==MOVENORTHTASK && detectFront().getObjectType()!=IFrontSensorResult.Types.WALL) {
+            myMove();
+            System.out.println("Pas de mur devant");
+            sendLogMessage("no wall");
+            return;
+          }
+          
+          if (state==MOVENORTHTASK && detectFront().getObjectType()==IFrontSensorResult.Types.WALL) {
+        	  System.out.println("Mur devant, on essaye de tourner a droite");
+        	  stepTurn(Parameters.Direction.RIGHT);
+        	  sendLogMessage("wall");
+        	  state=TURNEASTTASK;
+        	  myMove();
+        	  //oldAngle=getHeading();
+        	  return;
+          }
+
+          if (state==TURNEASTTASK && !(isSameDirection(getHeading(),Parameters.EAST))) {
+              stepTurn(Parameters.Direction.RIGHT);
+              System.out.println("On tourne vers l'est");
+              return;
+            }
+          
+          if(state==TURNEASTTASK && (isSameDirection(getHeading(),Parameters.EAST))) {
+        	  if(mode==RUNNER) {
+        		  System.out.println("On est tourné vers l'est");
+        		  state=LOOP;
+        	  }
+        	  myMove();
+        	  return;
+          }
+          
+          if(state==LOOP && detectFront().getObjectType()!=IFrontSensorResult.Types.WALL) {
+        	  System.out.println("Pas de mur");
+        	  myMove();
+        	  return;
+          }
+          if(state==LOOP && detectFront().getObjectType() == IFrontSensorResult.Types.WALL) {
+        	  System.out.println("Mur");
+        	  for (IRadarResult o: detectRadar()) {
+        		  System.out.println(whoAmI);
+            	  System.out.println(o.getObjectDistance());
+            	  state=LOOP;
+        	  }
+        	  //System.out.println(detectFront().getObjectType());
+        	  
+        	  
+        	  //myMove();
+        	  return;
+          }
+          
     }
 
     //---AUTOMATON DEPLACEMENT---//
-    if(mode == RUNNER){
-        if(target == "base"){
-            state = TURNNORTHTASK;
-        }
-    }
-
-    if (state==TURNNORTHTASK && !(isSameDirection(getHeading(),Parameters.NORTH))) {
-        stepTurn(Parameters.Direction.LEFT);
-        return;
-      }
-
-      if (state==TURNNORTHTASK && (isSameDirection(getHeading(),Parameters.NORTH))) {
-        state = MOVENORTHTASK;
-        myMove();
-        return;
-      }
-
-      if (state==MOVENORTHTASK && detectFront().getObjectType()!=IFrontSensorResult.Types.WALL) {
-        myMove();
-        sendLogMessage("herre");
-        return;
-      }
-      
-      if (state==MOVENORTHTASK && detectFront().getObjectType()==IFrontSensorResult.Types.WALL) {
-        state=TURNEASTTASK;
-        oldAngle=getHeading();
-        stepTurn(Parameters.Direction.RIGHT);
-        return;
-      }
-
-  
+    
     }   
 
 private boolean isSameDirection(double dir1, double dir2){
