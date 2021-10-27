@@ -23,7 +23,8 @@ public class AttackMain extends Brain {
   private static final int TURNNORTHTASK = 5;
   private static final int MOVENORTHTASK = 6;
   private static final int SWINGTASK = 7;
-  private static final int LOOP = 8;  
+  private static final int LOOP = 8;
+  private static final int LOOPTURN = 9;
   private static final int TURNSOUTHBISTASK = 51;
 
   private static final int FREEZE = -1;
@@ -88,8 +89,10 @@ public class AttackMain extends Brain {
     
     //DEBUG MESSAGE
     if (whoAmI == ROCKY) {
+    	
         sendLogMessage("#ROCKY *thinks* he is rolling at position ("+(int)myX+", "+(int)myY+"). State ="+state+". Objet:"+detectFront().getObjectType());
-        if(mode == RUNNER){
+        
+    }if(mode == RUNNER){
         	
         	//Sila prochaine dest est la base
             if(target == "base"){
@@ -137,7 +140,7 @@ public class AttackMain extends Brain {
 
           if (state==TURNEASTTASK && !(isSameDirection(getHeading(),Parameters.EAST))) {
               stepTurn(Parameters.Direction.RIGHT);
-              System.out.println("On tourne vers l'est");
+              System.out.println("On tourne vers la droite");
               return;
             }
           
@@ -153,27 +156,28 @@ public class AttackMain extends Brain {
           if(state==LOOP && detectFront().getObjectType()!=IFrontSensorResult.Types.WALL) {
         	  System.out.println("Pas de mur");
         	  myMove();
-        	  return;
-          }
-          if(state==LOOP && detectFront().getObjectType() == IFrontSensorResult.Types.WALL) {
-        	  System.out.println("Mur");
-        	  for (IRadarResult o: detectRadar()) {
-        		  System.out.println(whoAmI);
-            	  System.out.println(o.getObjectDistance());
-            	  state=LOOP;
-        	  }
-        	  //System.out.println(detectFront().getObjectType());
-        	  
-        	  
-        	  //myMove();
+        	  oldAngle=getHeading();
         	  return;
           }
           
-    }
+          //Si on a un mur devant
+          if(state==LOOP && detectFront().getObjectType() == IFrontSensorResult.Types.WALL ) {
+        	  state = LOOPTURN;
+        	  oldAngle=getHeading();
+          }
+        	  
+          if(state==LOOPTURN && !isSameDirection(getHeading(), oldAngle+(Math.PI*0.5) )) {
+        	  stepTurn(Parameters.Direction.RIGHT);
+        	  System.out.println(getHeading()+"   "+oldAngle+(Math.PI*0.5) );
+        	  return;
+          }
+          if(state==LOOPTURN && isSameDirection(getHeading(), oldAngle+(Math.PI*0.5))) {
+        	  state=LOOP;
+        	  return;
+          }
 
-    //---AUTOMATON DEPLACEMENT---//
+    }
     
-    }   
 
 private boolean isSameDirection(double dir1, double dir2){
     return Math.abs(normalize(dir1)-normalize(dir2))<ANGLEPRECISION;
