@@ -22,7 +22,7 @@ public class Parameters {
   //---TEAM-A-PARAMETERS---//
   //-----------------------//
   public static final String teamAName = "Attack";
-  public static final String teamAMainBotBrainClassName = "algorithms.BrainMain"; //class given by name; is supposed to extends robotsimulator.Brain
+  public static final String teamAMainBotBrainClassName = "algorithms.Stage6MainA"; //class given by name; is supposed to extends robotsimulator.Brain
   public static final String teamAMainBotAvatar = "avatars/cyclope.png"; //path relative to location of ant build.xml file
   public static final double teamAMainBotRadius = 50, //1 unit = 1mm, body radius
                              teamAMainBotFrontalDetectionRange = 500, //1 unit = 1mm, range of frontal sensor
@@ -69,15 +69,15 @@ public class Parameters {
                              teamBMainBotHealth = 300, //FICTIONAL SIMOVIES
                              teamBMainBot1InitX = 2800, //1 unit = 1mm, coordinate of central point
                              teamBMainBot1InitY = 800, //1 unit = 1mm, coordinate of central point
-                             teamBMainBot1InitHeading = WEST, //clockwise trigonometric unit, according to screen pixel coordinate reference
+                             teamBMainBot1InitHeading = NORTH, //clockwise trigonometric unit, according to screen pixel coordinate reference
                              teamBMainBot2InitX = 2800, //1 unit = 1mm, coordinate of central point
                              teamBMainBot2InitY = 1000, //1 unit = 1mm, coordinate of central point
-                             teamBMainBot2InitHeading = WEST, //clockwise trigonometric unit, according to screen pixel coordinate reference
+                             teamBMainBot2InitHeading = NORTH, //clockwise trigonometric unit, according to screen pixel coordinate reference
                              teamBMainBot3InitX = 2800, //1 unit = 1mm, coordinate of central point
                              teamBMainBot3InitY = 1200, //1 unit = 1mm, coordinate of central point
-                             teamBMainBot3InitHeading = WEST; //clockwise trigonometric unit, according to screen pixel coordinate reference
+                             teamBMainBot3InitHeading = NORTH; //clockwise trigonometric unit, according to screen pixel coordinate reference
 
-  public static final String teamBSecondaryBotBrainClassName = "algorithms.BrainMain"; //class given by name; is supposed to extends robotsimulator.Brain
+  public static final String teamBSecondaryBotBrainClassName = "algorithms.CampBot"; //class given by name; is supposed to extends robotsimulator.Brain
   public static final String teamBSecondaryBotAvatar = "avatars/fannyExplorer.png"; //path relative to location of ant build.xml file
   public static final double teamBSecondaryBotRadius = 50, //1 unit = 1mm, body radius
                              teamBSecondaryBotFrontalDetectionRange = 500, //1 unit = 1mm, range of frontal sensor
@@ -87,10 +87,10 @@ public class Parameters {
                              teamBSecondaryBotHealth = 100, //FICTIONAL SIMOVIES
                              teamBSecondaryBot1InitX = 2500, //1 unit = 1mm, coordinate of central point
                              teamBSecondaryBot1InitY = 800, //1 unit = 1mm, coordinate of central point
-                             teamBSecondaryBot1InitHeading = WEST, //clockwise trigonometric unit, according to screen pixel coordinate reference
+                             teamBSecondaryBot1InitHeading = NORTH, //clockwise trigonometric unit, according to screen pixel coordinate reference
                              teamBSecondaryBot2InitX = 2500, //1 unit = 1mm, coordinate of central point
                              teamBSecondaryBot2InitY = 1200, //1 unit = 1mm, coordinate of central point
-                             teamBSecondaryBot2InitHeading = WEST; //clockwise trigonometric unit, according to screen pixel coordinate reference
+                             teamBSecondaryBot2InitHeading = NORTH; //clockwise trigonometric unit, according to screen pixel coordinate reference
   
   //-----------------------//
   //---BULLET-PARAMETERS---//
