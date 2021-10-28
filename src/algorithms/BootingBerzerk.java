@@ -35,6 +35,7 @@ public class BootingBerzerk extends Brain {
   private boolean fireOrder;
   private double targetX,targetY;
   private int countDown;
+  private boolean isMoving;
    
 
   //---CONSTRUCTORS---//
@@ -42,6 +43,7 @@ public class BootingBerzerk extends Brain {
 
   //---ABSTRACT-METHODS-IMPLEMENTATION---//
   public void activate() {
+    isMoving=true;
     turnTask=true;
     moveTask=false;
     firstMove=true;
@@ -78,6 +80,11 @@ public class BootingBerzerk extends Brain {
       fire(Math.random()*Math.PI*2);
       return;
     }*/
+    if (isMoving){
+      myX+=Parameters.teamAMainBotSpeed*Math.cos(myGetHeading());
+      myY+=Parameters.teamAMainBotSpeed*Math.sin(myGetHeading());
+      isMoving=true;
+    }
     ArrayList<String> messages=fetchAllMessages();
     for (String m: messages) 
       if (Integer.parseInt(m.split(":")[1])==whoAmI || Integer.parseInt(m.split(":")[1])==TEAM){
@@ -88,7 +95,7 @@ public class BootingBerzerk extends Brain {
         // ne prend que 1 des 2 ordres
         //fireRythm*=1000;
         firePosition(targetX,targetY);
-        fire(0);
+        //fire(0);
         sendLogMessage("Turning point. Waza!");
         return;
       }
@@ -274,5 +281,12 @@ public class BootingBerzerk extends Brain {
     while(result<0) result+=2*Math.PI;
     while(result>=2*Math.PI) result-=2*Math.PI;
     return result;
+  }
+    private void myMove(){
+    isMoving=true;
+    move();
+  }
+  private double myGetHeading(){
+    return normalizeRadian(getHeading());
   }
 }
