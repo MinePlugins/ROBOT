@@ -2,7 +2,7 @@
  * Simovies - Eurobot 2015 Robomovies Simulator.
  * Copyright (C) 2014 <Binh-Minh.Bui-Xuan@ens-lyon.org>.
  * GPL version>=3 <http://www.gnu.org/licenses/>.
- * $Id: algorithms/BootingBerzerk.java 2014-11-03 buixuan.
+ * $Id: algorithms/BootingBerzerk2.java 2014-11-03 buixuan.
  * ******************************************************/
 package algorithms;
 
@@ -13,16 +13,8 @@ import characteristics.Parameters;
 import characteristics.IFrontSensorResult;
 import characteristics.IRadarResult;
 
-public class BootingBerzerk extends Brain {
+public class BootingBerzerk2 extends Brain {
   //---PARAMETERS---//
-  private static final double ANGLEPRECISION = 0.01;
-  private static final double FIREANGLEPRECISION = Math.PI/(double)6;
-  private static final int ALPHA = 0x1EADDA;
-  private static final int BETA = 0x5EC0;
-  private static final int GAMMA = 0x333;
-  private static final int TEAM = 0xBADDAD;
-   private static final int FIRE = 0xB52;
-  private static final int UNDEFINED = 0xBADC0DE0;
   private static final double HEADINGPRECISION = 0.001;
 
   //---VARIABLES---//
@@ -30,15 +22,9 @@ public class BootingBerzerk extends Brain {
   private double endTaskDirection,lastSeenDirection;
   private int endTaskCounter,berzerkInerty;
   private boolean firstMove,berzerkTurning;
-  private double myX,myY;
-  private int whoAmI;
-  private boolean fireOrder;
-  private double targetX,targetY;
-  private int countDown;
-   
 
   //---CONSTRUCTORS---//
-  public BootingBerzerk() { super(); }
+  public BootingBerzerk2() { super(); }
 
   //---ABSTRACT-METHODS-IMPLEMENTATION---//
   public void activate() {
@@ -56,43 +42,12 @@ public class BootingBerzerk extends Brain {
     if (turnRight) stepTurn(Parameters.Direction.RIGHT);
     else stepTurn(Parameters.Direction.LEFT);
     sendLogMessage("Turning point. Waza!");
-    whoAmI = GAMMA;
-    for (IRadarResult o: detectRadar())
-      if (isSameDirection(o.getObjectDirection(),Parameters.NORTH)) whoAmI=ALPHA;
-    for (IRadarResult o: detectRadar())
-      if (isSameDirection(o.getObjectDirection(),Parameters.SOUTH) && whoAmI!=GAMMA) whoAmI=BETA;
-    if (whoAmI == GAMMA){
-      myX=Parameters.teamBMainBot1InitX;
-      myY=Parameters.teamBMainBot1InitY;
-    } else {
-      myX=Parameters.teamBMainBot2InitX;
-      myY=Parameters.teamBMainBot2InitY;
-    }
-    if (whoAmI == ALPHA){
-      myX=Parameters.teamBMainBot3InitX;
-      myY=Parameters.teamBMainBot3InitY;
-    }
   }
   public void step() {
     /*if (Math.random()<0.01 && !berzerk) {
       fire(Math.random()*Math.PI*2);
       return;
     }*/
-    ArrayList<String> messages=fetchAllMessages();
-    for (String m: messages) 
-      if (Integer.parseInt(m.split(":")[1])==whoAmI || Integer.parseInt(m.split(":")[1])==TEAM){
-        process(m);
-        sendLogMessage(m);
-      } 
-      if (fireOrder /*&& friendlyFire*/) {
-        // ne prend que 1 des 2 ordres
-        //fireRythm*=1000;
-        firePosition(targetX,targetY);
-        fire(0);
-        sendLogMessage("Turning point. Waza!");
-        return;
-      }
-    
     ArrayList<IRadarResult> radarResults = detectRadar();
     if (berzerk) {
       if (berzerkTurning) {
@@ -107,8 +62,7 @@ public class BootingBerzerk extends Brain {
         }
         return;
       }
-
-      if (endTaskCounter<0) {
+      /*if (endTaskCounter<0) {
         turnTask=true;
         moveTask=false;
         berzerk=false;
@@ -133,7 +87,7 @@ public class BootingBerzerk extends Brain {
         } else {
           if (back) moveBack(); else move();
         }
-      }
+      }*/
       if (berzerkInerty>50) {
         turnTask=true;
         moveTask=false;
@@ -220,7 +174,7 @@ public class BootingBerzerk extends Brain {
       return;
     }
     if (moveTask) {
-      /*if (detectFront().getObjectType()!=NOTHING) {
+      /*if (detectFront()!=NOTHING) {
         turnTask=true;
         moveTask=false;
         endTaskDirection=(Math.random()-0.5)*Math.PI;
@@ -249,30 +203,5 @@ public class BootingBerzerk extends Brain {
   }
   private boolean isHeading(double dir){
     return Math.abs(Math.sin(getHeading()-dir))<Parameters.teamAMainBotStepTurnAngle;
-  }
-    private void process(String message){
-    targetX=Double.parseDouble(message.split(":")[3]);
-    targetY=Double.parseDouble(message.split(":")[4]);
-    if (Integer.parseInt(message.split(":")[2])==FIRE && Math.abs(myX-targetX)<=700 && Math.abs(myY-targetY)<=700) {
-      fireOrder=true;
-      countDown=0;
-    }else{
-      fireOrder=false;
-    }
-  }
-  private void firePosition(double x, double y){
-    sendLogMessage( "ici: "+Math.PI+Math.atan((y-myY)/(double)(x-myX)));
-    if (myX<=x) fire(Math.atan((y-myY)/(double)(x-myX)));
-    else fire(Math.PI+Math.atan((y-myY)/(double)(x-myX)));
-    return;
-  }
-  private boolean isSameDirection(double dir1, double dir2){
-    return Math.abs(normalizeRadian(dir1)-normalizeRadian(dir2))<ANGLEPRECISION;
-  }
-  private double normalizeRadian(double angle){
-    double result = angle;
-    while(result<0) result+=2*Math.PI;
-    while(result>=2*Math.PI) result-=2*Math.PI;
-    return result;
   }
 }

@@ -83,10 +83,7 @@ public class Stage7SecondaryB extends Brain {
         double enemyX=myX+o.getObjectDistance()*Math.cos(o.getObjectDirection());
         double enemyY=myY+o.getObjectDistance()*Math.sin(o.getObjectDirection());
         broadcast(whoAmI+":"+TEAM+":"+FIRE+":"+enemyX+":"+enemyY+":"+OVER);
-      }else{
-        double enemyX=myX+o.getObjectDistance()*Math.cos(o.getObjectDirection());
-        double enemyY=myY+o.getObjectDistance()*Math.sin(o.getObjectDirection());
-        broadcast(whoAmI+":"+TEAM+":"+NO+":"+enemyX+":"+enemyY+":"+OVER);
+        //System.out.println("ici");
       }
       if (o.getObjectDistance()<=100) {
         freeze=true;

@@ -48,11 +48,13 @@ public class Stage7MainB extends Brain {
   private boolean friendlyFire;
 
   //---CONSTRUCTORS---//
-  public Stage7MainB() { super(); }
+  public Stage7MainB() { super(
+  ); }
 
   //---ABSTRACT-METHODS-IMPLEMENTATION---//
   public void activate() {
     //ODOMETRY CODE
+    //Parameters.teamBMainBotFrontalDetectionRange=3000;
     whoAmI = GAMMA;
     for (IRadarResult o: detectRadar())
       if (isSameDirection(o.getObjectDirection(),Parameters.NORTH)) whoAmI=ALPHA;
@@ -198,9 +200,12 @@ public class Stage7MainB extends Brain {
     if (Integer.parseInt(message.split(":")[2])==FIRE && Math.abs(myX-targetX)<=700 && Math.abs(myY-targetY)<=700) {
       fireOrder=true;
       countDown=0;
+    }else{
+      fireOrder=false;
     }
   }
   private void firePosition(double x, double y){
+    sendLogMessage( ""+Math.PI+Math.atan((y-myY)/(double)(x-myX)));
     if (myX<=x) fire(Math.atan((y-myY)/(double)(x-myX)));
     else fire(Math.PI+Math.atan((y-myY)/(double)(x-myX)));
     return;
