@@ -43,7 +43,7 @@ public class BootingBerzerk extends Brain {
 
   //---ABSTRACT-METHODS-IMPLEMENTATION---//
   public void activate() {
-    isMoving=true;
+    isMoving=false;
     turnTask=true;
     moveTask=false;
     firstMove=true;

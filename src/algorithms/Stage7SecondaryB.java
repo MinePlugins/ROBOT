@@ -31,6 +31,7 @@ public class Stage7SecondaryB extends Brain {
   private static final int MOVETASK = 2;
   private static final int TURNRIGHTTASK = 3;
   private static final int LATERALINVERSE = 4;
+  private static final int INIT = 5;
   private static final int SINK = 0xBADC0DE1;
   
 
@@ -85,37 +86,27 @@ public class Stage7SecondaryB extends Brain {
         broadcast(whoAmI+":"+TEAM+":"+FIRE+":"+enemyX+":"+enemyY+":"+OVER);
         //System.out.println("ici");
       }
-      if (o.getObjectDistance()<=100) {
+      /*if (o.getObjectDistance()<=100) {
         freeze=true;
-      }
+      }*/
     }
 if (freeze) return;
     //AUTOMATON
-        // on va définir son positionnemente t sa façon de bouger 
-    if (whoAmI == ROCKY && state==MOVETASK && detectFront().getObjectType()==IFrontSensorResult.Types.NOTHING){
-      if ((int)myX <=500 ){
-        for (IRadarResult o: detectRadar()){
-        System.out.println(o.getObjectDistance());
-        }
-        System.out.println("ici");
-        state=LATERALINVERSE;
-        //on repart a droite
-      }else if((int)myX >=2810){
-        // on repart a gauche
-        System.out.println("la");
-      }else{
-        myMove();
-      }
-      return;
 
-    }
-    if(state==LATERALINVERSE && whoAmI == ROCKY){
-      stepTurn(Parameters.Direction.RIGHT);
+    /*if(state==LATERALINVERSE && whoAmI != ROCKY){
       move();
       return;
+    }*/
+
+    if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE))) {
+      stepTurn(Parameters.Direction.LEFT);
+      //sendLogMessage("Iceberg at 12 o'clock. Heading 3!");
+      return;
     }
-    if(state==LATERALINVERSE && whoAmI != ROCKY){
-      move();
+    if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE)) {
+      state=MOVETASK;
+      myMove();
+      //sendLogMessage("Moving a head. Waza!");
       return;
     }
     if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),Parameters.NORTH))) {
@@ -135,10 +126,18 @@ if (freeze) return;
       return;
     }
     if (state==MOVETASK && detectFront().getObjectType()!=IFrontSensorResult.Types.NOTHING) {
+      System.out.println("kaka");
+      if (whoAmI== ROCKY){
+        state=TURNLEFTTASK;
+        oldAngle=getHeading();
+        stepTurn(Parameters.Direction.LEFT);
+        // tourner a  gauche de 90
+      }else{
       state=TURNRIGHTTASK;
       oldAngle=getHeading();
       stepTurn(Parameters.Direction.RIGHT);
       //sendLogMessage("Iceberg at 12 o'clock. Heading 3!");
+      }
       return;
     }
 

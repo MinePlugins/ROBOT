@@ -115,9 +115,9 @@ public class Stage7MainB extends Brain {
         broadcast(whoAmI+":"+TEAM+":"+FIRE+":"+enemyX+":"+enemyY+":"+OVER);
       }
       if (o.getObjectDistance()<=100 && !isRoughlySameDirection(o.getObjectDirection(),getHeading())) {
-        freeze=true;
+        freeze=false;
       }
-      if (o.getObjectType()==IRadarResult.Types.TeamMainBot || o.getObjectType()==IRadarResult.Types.TeamSecondaryBot || o.getObjectType()==IRadarResult.Types.Wreck) {
+      if (o.getObjectType()==IRadarResult.Types.TeamMainBot || o.getObjectType()==IRadarResult.Types.TeamSecondaryBot /*|| o.getObjectType()==IRadarResult.Types.Wreck*/) {
         if (fireOrder && onTheWay(o.getObjectDirection())) {
           friendlyFire=false;
           fireOrder=false;
@@ -129,19 +129,20 @@ public class Stage7MainB extends Brain {
     //AUTOMATON
     if (fireOrder) countDown++;
     if (countDown>=10000) fireOrder=false;
-    if (fireOrder && friendlyFire) {
+    if (fireOrder /*&& friendlyFire*/) {
       // ne prend que 1 des 2 ordres
       fireRythm*=1000;
-      firePosition(targetX,targetY);
+      firePosition(targetX+10,targetY+10);
       
       return;
     }
-    fireRythm*=1000;
+    fireRythm*=15000;
     //if (fireRythm>=Parameters.bulletFiringLatency) fireRythm=150;
     if (state==TURNSOUTHTASK && !(isSameDirection(getHeading(),Parameters.NORTH))) {
       stepTurn(Parameters.Direction.RIGHT);
       return;
     }
+    /*
     if (state==TURNSOUTHTASK && isSameDirection(getHeading(),Parameters.NORTH)) {
       state=MOVETASK;
       myMove();
@@ -165,7 +166,7 @@ public class Stage7MainB extends Brain {
       state=MOVETASK;
       myMove();
       return;
-    }
+    }*/
 
     if (state==SINK) {
       myMove();
@@ -197,7 +198,7 @@ public class Stage7MainB extends Brain {
   private void process(String message){
     targetX=Double.parseDouble(message.split(":")[3]);
     targetY=Double.parseDouble(message.split(":")[4]);
-    if (Integer.parseInt(message.split(":")[2])==FIRE && Math.abs(myX-targetX)<=700 && Math.abs(myY-targetY)<=700) {
+    if (Integer.parseInt(message.split(":")[2])==FIRE /*&& Math.abs(myX-targetX)<=700 && Math.abs(myY-targetY)<=700*/) {
       fireOrder=true;
       countDown=0;
     }else{

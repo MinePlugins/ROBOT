@@ -59,7 +59,7 @@ public class Parameters {
   //---TEAM-B-PARAMETERS---//
   //-----------------------//
   public static final String teamBName = "Defense";
-  public static final String teamBMainBotBrainClassName = "algorithms.BootingBerzerk"; //class given by name; is supposed to extends robotsimulator.Brain
+  public static final String teamBMainBotBrainClassName = "algorithms.Stage7MainB"; //class given by name; is supposed to extends robotsimulator.Brain
   public static final String teamBMainBotAvatar = "avatars/hollowee.png"; //path relative to location of ant build.xml file
   public static final double teamBMainBotRadius = 50, //1 unit = 1mm, body radius
                              teamBMainBotFrontalDetectionRange = 300, //1 unit = 1mm, range of frontal sensor
