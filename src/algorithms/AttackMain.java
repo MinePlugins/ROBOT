@@ -1,4 +1,12 @@
+/* ******************************************************
+ * Simovies - Eurobot 2015 Robomovies Simulator.
+ * Copyright (C) 2014 <Binh-Minh.Bui-Xuan@ens-lyon.org>.
+ * GPL version>=3 <http://www.gnu.org/licenses/>.
+ * $Id: algorithms/BootingBerzerk.java 2014-11-03 buixuan.
+ * ******************************************************/
 package algorithms;
+
+import java.util.ArrayList;
 
 import robotsimulator.Brain;
 import characteristics.Parameters;
@@ -6,52 +14,70 @@ import characteristics.IFrontSensorResult;
 import characteristics.IRadarResult;
 
 public class AttackMain extends Brain {
-    //---PARAMETERS---//
+  //---PARAMETERS---//
   private static final double HEADINGPRECISION = 0.001;
-  private static final double ANGLEPRECISION = 0.05;
+  private static final double ANGLEPRECISION = 0.1;
 
-  //---Robots---//
   private static final int ROCKY = 0x1EADDA;
   private static final int MARIO = 0x5EC0;
-  private static final int UNDEFINED = 0xBADC0DE0;
-
-  //Variables de tâches
-  private static final int TURNSOUTHTASK = 1;
-  private static final int MOVESOUTHTASK = 2;
-  private static final int TURNEASTTASK = 3;
-  private static final int MOVEEASTTASK = 4;
-  private static final int TURNNORTHTASK = 5;
-  private static final int MOVENORTHTASK = 6;
-  private static final int SWINGTASK = 7;
-  private static final int LOOP = 8;
-  private static final int LOOPTURN = 9;
-  private static final int TURNSOUTHBISTASK = 51;
-
-  private static final int FREEZE = -1;
-
-  
-  private static final int SINK = 0xBADC0DE1;
-
-  //variables d'etats du comportement
-  private static final int HUNTER = 10;
-  private static final int RUNNER = 15;
 
   //---VARIABLES---//
-  private int state;
-  private double oldAngle;
-  private double myX,myY;
-  private boolean isMoving;
-  private boolean freeze;
-  private int whoAmI;
-  private int mode;
-  private String target;
-  private boolean initRunner;
+  private boolean turnTask,turnRight,moveTask,berzerk,back;
+  private double endTaskDirection,lastSeenDirection;
+  private int endTaskCounter,berzerkInerty;
+  private boolean firstMove,berzerkTurning;
+
+
+    //Variables de tâches
+    private static final int TURNLEFTTASK = 1;
+    private static final int MOVETASK = 2;
+    private static final int TURNRIGHTTASK = 3;
+    private static final int SINK = 0xBADC0DE1;
+  
+    //variables d'etats du comportement
+    private static final int HUNTER = 10;
+    private static final int RUNNER = 15;
+  
+    //---VARIABLES---//
+    private int state;
+    private double oldAngle;
+    private double myX,myY;
+    private boolean isMoving;
+    private boolean freeze;
+    private int whoAmI;
+    private int mode;
+    private String target;
+    private boolean initRunner;
+    private int maxX, maxY;
+    private double dist;
+  
+    private int countDown;
+    private double targetX,targetY;
+    private boolean fireOrder;
+    private boolean friendlyFire;
 
   //---CONSTRUCTORS---//
   public AttackMain() { super(); }
 
   //---ABSTRACT-METHODS-IMPLEMENTATION---//
   public void activate() {
+    //HUNTER
+    turnTask=true;
+    moveTask=false;
+    firstMove=true;
+    berzerk=false;
+    berzerkInerty=0;
+    berzerkTurning=false;
+    back=false;
+    endTaskDirection=(Math.random()-0.5)*0.5*Math.PI;
+    turnRight=(endTaskDirection>0);
+    endTaskDirection+=getHeading();
+    lastSeenDirection=Math.random()*Math.PI*2;
+    if (turnRight) stepTurn(Parameters.Direction.RIGHT);
+    else stepTurn(Parameters.Direction.LEFT);
+    sendLogMessage("Turning point. Waza!");
+
+    //RUNNER
     //ODOMETRY CODE
     whoAmI = ROCKY;
     for (IRadarResult o: detectRadar())
@@ -63,123 +89,202 @@ public class AttackMain extends Brain {
       myX=0;
       myY=0;
     }
-
+    
     //INIT
-    state = TURNNORTHTASK;
+    state = TURNLEFTTASK;
     mode=RUNNER;
     isMoving=false;
     oldAngle=getHeading();
-    target = "base";
-    initRunner=true;
+  }
+  public void step() {
+    ArrayList<IRadarResult> radarResults = detectRadar();
+    //MODE HUNTER
+    if(mode == HUNTER)
+    {
+      if (berzerk) {
+        if (berzerkTurning) {
+          endTaskCounter--;
+          if (isHeading(endTaskDirection)) {
+            berzerkTurning=false;
+            move();
+            sendLogMessage("Moving a head. Waza!");
+          } else {
+            if (turnRight) stepTurn(Parameters.Direction.RIGHT);
+            else stepTurn(Parameters.Direction.LEFT);
+          }
+          return;
+        }
+
+        if (berzerkInerty>50) {
+          turnTask=true;
+          moveTask=false;
+          berzerk=false;
+          endTaskDirection=(Math.random()-0.5)*2*Math.PI;
+          turnRight=(endTaskDirection>0);
+          endTaskDirection+=getHeading();
+          if (turnRight) stepTurn(Parameters.Direction.RIGHT);
+          else stepTurn(Parameters.Direction.LEFT);
+          sendLogMessage("Turning point. Waza!");
+          return;
+        }
+        if (endTaskCounter<0) {
+          for (IRadarResult r : radarResults) {
+            if (r.getObjectType()==IRadarResult.Types.OpponentMainBot) {
+              fire(r.getObjectDirection());
+              lastSeenDirection=r.getObjectDirection();
+              berzerkInerty=0;
+              return;
+            }
+          }
+          fire(lastSeenDirection);
+          berzerkInerty++;
+          endTaskCounter=21;
+          return;
+        } else {
+          endTaskCounter--;
+          for (IRadarResult r : radarResults) {
+            if (r.getObjectType()==IRadarResult.Types.OpponentMainBot) {
+              lastSeenDirection=r.getObjectDirection();
+              berzerkInerty=0;
+              move();
+              return;
+            }
+          }
+          berzerkInerty++;
+          move();
+        }
+        return;
+      }
+      if (radarResults.size()==0){
+        mode = RUNNER;
+      }
+      if (radarResults.size()!=0){
+        for (IRadarResult r : radarResults) {
+          if (r.getObjectType()==IRadarResult.Types.OpponentMainBot) {
+            berzerk=true;
+            back=(Math.cos(getHeading()-r.getObjectDirection())>0);
+            endTaskCounter=21;
+            fire(r.getObjectDirection());
+            lastSeenDirection=r.getObjectDirection();
+            berzerkTurning=true;
+            endTaskDirection=lastSeenDirection;
+            double ref=endTaskDirection-getHeading();
+            if (ref<0) ref+=Math.PI*2;
+            turnRight=(ref>0 && ref<Math.PI);
+            return;
+          }
+        }
+      }
+      if (turnTask) {
+        if (isHeading(endTaskDirection)) {
+          if (firstMove) {
+            firstMove=false;
+        turnTask=false;
+            moveTask=true;
+            endTaskCounter=400;
+      move();
+            sendLogMessage("Moving a head. Waza!");
+            return;
+          }
+    turnTask=false;
+          moveTask=true;
+          endTaskCounter=100;
+    move();
+          sendLogMessage("Moving a head. Waza!");
+        } else {
+          if (turnRight) stepTurn(Parameters.Direction.RIGHT);
+          else stepTurn(Parameters.Direction.LEFT);
+        }
+        return;
+      }
+      if (moveTask) {
+        if (endTaskCounter<0) {
+          turnTask=true;
+          moveTask=false;
+          endTaskDirection=(Math.random()-0.5)*2*Math.PI;
+          turnRight=(endTaskDirection>0);
+          endTaskDirection+=getHeading();
+          if (turnRight) stepTurn(Parameters.Direction.RIGHT);
+          else stepTurn(Parameters.Direction.LEFT);
+          sendLogMessage("Turning point. Waza!");
+        } else {
+          endTaskCounter--;
+          move();
+        }
+        return;
+      }
+      return;
+    }
+
+    //MODE RUNNER
+    if(mode == RUNNER)
+    {
+      if (radarResults.size()!=0){
+        for (IRadarResult r : radarResults) {
+          if (r.getObjectType()==IRadarResult.Types.OpponentMainBot) {
+            mode = HUNTER;
+          }
+        }
+      }
+      
+      //AUTOMATON
+      if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),Parameters.EAST))) {
+        stepTurn(Parameters.Direction.LEFT);
+        return;
+      }
+      if (state==TURNLEFTTASK && isSameDirection(getHeading(),Parameters.EAST)) {
+        state=MOVETASK;
+        myMove();
+        return;
+      }
+
+      if (state==MOVETASK && detectFront().getObjectType()!=IFrontSensorResult.Types.WALL) {
+        myMove();
+        return;
+      }
+
+      if (state==MOVETASK && (detectFront().getObjectType()==IFrontSensorResult.Types.WALL
+      ||detectFront().getObjectType()==IFrontSensorResult.Types.TeamMainBot
+      ||detectFront().getObjectType()==IFrontSensorResult.Types.TeamSecondaryBot
+      ||detectFront().getObjectType()==IFrontSensorResult.Types.OpponentMainBot
+      )) {
+        state=TURNRIGHTTASK;
+        oldAngle=getHeading();
+        stepTurn(Parameters.Direction.RIGHT);
+        return;
+      }
+
+      if (state==TURNRIGHTTASK && !(isSameDirection(getHeading(),oldAngle+Parameters.RIGHTTURNFULLANGLE))) {
+        stepTurn(Parameters.Direction.RIGHT);
+        return;
+      }
+
+      if (state==TURNRIGHTTASK && isSameDirection(getHeading(),oldAngle+Parameters.RIGHTTURNFULLANGLE)) {
+        state=MOVETASK;
+        myMove();
+        return;
+      }
+
+      if (state==SINK) {
+        myMove();
+        return;
+      }
+      if (true) {
+        return;
+      }
+    }
+  }
+
+  //FUNCTION
+  private boolean isHeading(double dir){
+    return Math.abs(Math.sin(getHeading()-dir))<Parameters.teamAMainBotStepTurnAngle;
   }
 
   private void myMove(){
     isMoving=true;
     move();
   }
-
-  public void step() {
-    //ODOMETRY CODE
-    if (isMoving && whoAmI == ROCKY){
-      myX+=Parameters.teamASecondaryBotSpeed*Math.cos(getHeading());
-      myY+=Parameters.teamASecondaryBotSpeed*Math.sin(getHeading());
-      isMoving=false;
-     }
-    
-    
-    //DEBUG MESSAGE
-    if (whoAmI == ROCKY) {
-    	
-        sendLogMessage("#ROCKY *thinks* he is rolling at position ("+(int)myX+", "+(int)myY+"). State ="+state+". Objet:"+detectFront().getObjectType());
-        
-    }if(mode == RUNNER){
-        	
-        	//Sila prochaine dest est la base
-            if(target == "base"){
-            	if(initRunner) {
-            		state = TURNNORTHTASK;
-            		initRunner=false;
-            		System.out.println("On doit aller vers le nord");
-            	}
-            	
-        	}else if(target == "objectif") {
-        		state = TURNSOUTHTASK;
-        		initRunner=false;
-        }
-        }
-        
-        if (state==TURNNORTHTASK && !(isSameDirection(getHeading(),Parameters.NORTH))) {
-            stepTurn(Parameters.Direction.LEFT);
-            System.out.println("On tourne vers le nord");
-            return;
-          }
-
-          if (state==TURNNORTHTASK && (isSameDirection(getHeading(),Parameters.NORTH))) {
-            state = MOVENORTHTASK;
-            System.out.println("On est vers le nord");
-            myMove();
-            return;
-          }
-
-          if (state==MOVENORTHTASK && detectFront().getObjectType()!=IFrontSensorResult.Types.WALL) {
-            myMove();
-            System.out.println("Pas de mur devant");
-            sendLogMessage("no wall");
-            return;
-          }
-          
-          if (state==MOVENORTHTASK && detectFront().getObjectType()==IFrontSensorResult.Types.WALL) {
-        	  System.out.println("Mur devant, on essaye de tourner a droite");
-        	  stepTurn(Parameters.Direction.RIGHT);
-        	  sendLogMessage("wall");
-        	  state=TURNEASTTASK;
-        	  myMove();
-        	  //oldAngle=getHeading();
-        	  return;
-          }
-
-          if (state==TURNEASTTASK && !(isSameDirection(getHeading(),Parameters.EAST))) {
-              stepTurn(Parameters.Direction.RIGHT);
-              System.out.println("On tourne vers la droite");
-              return;
-            }
-          
-          if(state==TURNEASTTASK && (isSameDirection(getHeading(),Parameters.EAST))) {
-        	  if(mode==RUNNER) {
-        		  System.out.println("On est tourné vers l'est");
-        		  state=LOOP;
-        	  }
-        	  myMove();
-        	  return;
-          }
-          
-          if(state==LOOP && detectFront().getObjectType()!=IFrontSensorResult.Types.WALL) {
-        	  System.out.println("Pas de mur");
-        	  myMove();
-        	  oldAngle=getHeading();
-        	  return;
-          }
-          
-          //Si on a un mur devant
-          if(state==LOOP && detectFront().getObjectType() == IFrontSensorResult.Types.WALL ) {
-        	  state = LOOPTURN;
-        	  oldAngle=getHeading();
-          }
-        	  
-          if(state==LOOPTURN && !isSameDirection(getHeading(), oldAngle+(Math.PI*0.5) )) {
-        	  stepTurn(Parameters.Direction.RIGHT);
-        	  System.out.println(getHeading()+"   "+oldAngle+(Math.PI*0.5) );
-        	  return;
-          }
-          if(state==LOOPTURN && isSameDirection(getHeading(), oldAngle+(Math.PI*0.5))) {
-        	  state=LOOP;
-        	  return;
-          }
-
-    }
-    
-
-private boolean isSameDirection(double dir1, double dir2){
+  private boolean isSameDirection(double dir1, double dir2){
     return Math.abs(normalize(dir1)-normalize(dir2))<ANGLEPRECISION;
   }
   private double normalize(double dir){
@@ -187,6 +292,6 @@ private boolean isSameDirection(double dir1, double dir2){
     while (res<0) res+=2*Math.PI;
     while (res>=2*Math.PI) res-=2*Math.PI;
     return res;
-  }
+  }  
 
 }
