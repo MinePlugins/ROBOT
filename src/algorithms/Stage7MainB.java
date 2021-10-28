@@ -46,6 +46,9 @@ public class Stage7MainB extends Brain {
   private boolean fireOrder;
   private boolean freeze;
   private boolean friendlyFire;
+  private double[] firePosition_Temp = {0,0}; // x, y
+  private double firePositionX_Temp = 0;
+  private double firePositionY_Temp = 0;
 
   //---CONSTRUCTORS---//
   public Stage7MainB() { super(
@@ -73,7 +76,7 @@ public class Stage7MainB extends Brain {
     }
 
     //INIT
-    state=TURNSOUTHTASK;
+    state=TURNLEFTTASK;
     isMoving=false;
     fireOrder=false;
     fireRythm=150;
@@ -118,9 +121,10 @@ public class Stage7MainB extends Brain {
         freeze=false;
       }
       if (o.getObjectType()==IRadarResult.Types.TeamMainBot || o.getObjectType()==IRadarResult.Types.TeamSecondaryBot /*|| o.getObjectType()==IRadarResult.Types.Wreck*/) {
+        System.out.println(onTheWay(o.getObjectDirection()));
         if (fireOrder && onTheWay(o.getObjectDirection())) {
           friendlyFire=false;
-          fireOrder=false;
+          fireOrder=true;
         }
       }
     }
@@ -129,10 +133,12 @@ public class Stage7MainB extends Brain {
     //AUTOMATON
     if (fireOrder) countDown++;
     if (countDown>=10000) fireOrder=false;
-    if (fireOrder /*&& friendlyFire*/) {
+    if (fireOrder && friendlyFire) {
       // ne prend que 1 des 2 ordres
       fireRythm*=1000;
-      firePosition(targetX+10,targetY+10);
+      // firePosition(targetX+10,targetY+10);
+      firePosition(firePositionX_Temp,firePositionY_Temp);
+
       
       return;
     }
@@ -157,21 +163,22 @@ public class Stage7MainB extends Brain {
       oldAngle=myGetHeading();
       stepTurn(Parameters.Direction.LEFT);
       return;
-    }
+    }*/
     if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE))) {
       stepTurn(Parameters.Direction.LEFT);
       return;
     }
-    if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE)) {
-      state=MOVETASK;
+    if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE) && myY <= 1690 ) {
+      // state=MOVETASK;
       myMove();
       return;
-    }*/
+    }
 
     if (state==SINK) {
       myMove();
       return;
     }
+
     if (true) {
       return;
     }
@@ -196,13 +203,22 @@ public class Stage7MainB extends Brain {
     return Math.abs(normalizeRadian(dir1)-normalizeRadian(dir2))<FIREANGLEPRECISION;
   }
   private void process(String message){
-    targetX=Double.parseDouble(message.split(":")[3]);
-    targetY=Double.parseDouble(message.split(":")[4]);
-    if (Integer.parseInt(message.split(":")[2])==FIRE /*&& Math.abs(myX-targetX)<=700 && Math.abs(myY-targetY)<=700*/) {
-      fireOrder=true;
-      countDown=0;
-    }else{
+    targetX = Double.parseDouble(message.split(":")[3]);
+    targetY = Double.parseDouble(message.split(":")[4]);
+    // System.out.println("targetX : " + targetX);
+    // System.out.println("targetY : " + targetY);
+    // System.out.println("Position X : " + firePositionX_Temp);
+    // permet de déterminer sur quel robot tirer, soit le plus proche
+    if(targetX >= firePositionX_Temp && targetX >= 1500 && targetY >= 250){
+      firePositionX_Temp = targetX;
+      firePositionY_Temp = targetY;
+      System.out.println(firePositionX_Temp + " | " + firePositionY_Temp);
+      if (Integer.parseInt(message.split(":")[2])==FIRE /*&& Math.abs(myX-targetX)<=700 && Math.abs(myY-targetY)<=700*/) {
+        fireOrder=true;
+        countDown=0;
+      }else{
       fireOrder=false;
+      }
     }
   }
   private void firePosition(double x, double y){

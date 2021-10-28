@@ -67,6 +67,8 @@ public class Stage7SecondaryB extends Brain {
     oldAngle=getHeading();
   }
   public void step() {
+   
+    
     //ODOMETRY CODE
     if (isMoving){
       myX+=Parameters.teamASecondaryBotSpeed*Math.cos(getHeading());
@@ -83,13 +85,15 @@ public class Stage7SecondaryB extends Brain {
       if (o.getObjectType()==IRadarResult.Types.OpponentMainBot || o.getObjectType()==IRadarResult.Types.OpponentSecondaryBot) {
         double enemyX=myX+o.getObjectDistance()*Math.cos(o.getObjectDirection());
         double enemyY=myY+o.getObjectDistance()*Math.sin(o.getObjectDirection());
-        broadcast(whoAmI+":"+TEAM+":"+FIRE+":"+enemyX+":"+enemyY+":"+OVER);
+        broadcast(whoAmI+":"+TEAM+":"+FIRE+":"+enemyX+":"+enemyY+":"+OVER+":");
         //System.out.println("ici");
       }
       /*if (o.getObjectDistance()<=100) {
         freeze=true;
       }*/
     }
+     if (myX <= 2200)
+    { freeze = true; return; } 
 if (freeze) return;
     //AUTOMATON
 
@@ -126,7 +130,7 @@ if (freeze) return;
       return;
     }
     if (state==MOVETASK && detectFront().getObjectType()!=IFrontSensorResult.Types.NOTHING) {
-      System.out.println("kaka");
+      // System.out.println("kaka");
       if (whoAmI== ROCKY){
         state=TURNLEFTTASK;
         oldAngle=getHeading();
@@ -152,6 +156,9 @@ if (freeze) return;
       //sendLogMessage("Moving a head. Waza!");
       return;
     }
+    
+    
+
 
     if (state==SINK) {
       myMove();
