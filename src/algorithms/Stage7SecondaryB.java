@@ -52,7 +52,7 @@ public class Stage7SecondaryB extends Brain {
     //ODOMETRY CODE
     whoAmI = ROCKY;
     for (IRadarResult o: detectRadar())
-      if (isSameDirection(o.getObjectDirection(),Parameters.NORTH)) whoAmI=UNDEFINED;
+      if (isSameDirection(o.getObjectDirection(),Parameters.NORTH)) whoAmI=MARIO;
     if (whoAmI == ROCKY){
       myX=Parameters.teamBSecondaryBot1InitX;
       myY=Parameters.teamBSecondaryBot1InitY;
@@ -102,62 +102,63 @@ if (freeze) return;
       return;
     }*/
 
-    if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE))) {
-      stepTurn(Parameters.Direction.LEFT);
-      //sendLogMessage("Iceberg at 12 o'clock. Heading 3!");
-      return;
-    }
-    if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE)) {
-      state=MOVETASK;
-      myMove();
-      //sendLogMessage("Moving a head. Waza!");
-      return;
-    }
-    if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),Parameters.NORTH))) {
-      stepTurn(Parameters.Direction.LEFT);
-      //sendLogMessage("Initial TeamA Secondary Bot1 position. Heading North!");
-      return;
-    }
-    if (state==TURNLEFTTASK && isSameDirection(getHeading(),Parameters.NORTH)) {
-      state=MOVETASK;
-      myMove();
-      //sendLogMessage("Moving a head. Waza!");
-      return;
-    }
-    if (state==MOVETASK && detectFront().getObjectType()==IFrontSensorResult.Types.NOTHING) {
-      myMove(); //And what to do when blind blocked?
-      //sendLogMessage("Moving a head. Waza!");
-      return;
-    }
-    if (state==MOVETASK && detectFront().getObjectType()!=IFrontSensorResult.Types.NOTHING) {
-      // System.out.println("kaka");
-      if (whoAmI== ROCKY){
-        state=TURNLEFTTASK;
-        oldAngle=getHeading();
-        stepTurn(Parameters.Direction.LEFT);
-        // tourner a  gauche de 90
-      }else{
-      state=TURNRIGHTTASK;
-      oldAngle=getHeading();
-      stepTurn(Parameters.Direction.RIGHT);
-      //sendLogMessage("Iceberg at 12 o'clock. Heading 3!");
-      }
-      return;
-    }
+        if(whoAmI == MARIO){
+            if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE))) {
+            stepTurn(Parameters.Direction.LEFT);
+            //sendLogMessage("Iceberg at 12 o'clock. Heading 3!");
+            return;
+            }
+            if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE)) {
+            state=MOVETASK;
+            myMove();
+            //sendLogMessage("Moving a head. Waza!");
+            return;
+            }
+            if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),Parameters.NORTH))) {
+            stepTurn(Parameters.Direction.LEFT);
+            //sendLogMessage("Initial TeamA Secondary Bot1 position. Heading North!");
+            return;
+            }
+            if (state==TURNLEFTTASK && isSameDirection(getHeading(),Parameters.NORTH)) {
+            state=MOVETASK;
+            myMove();
+            //sendLogMessage("Moving a head. Waza!");
+            return;
+            }
+            if (state==MOVETASK && detectFront().getObjectType()==IFrontSensorResult.Types.NOTHING) {
+            myMove(); //And what to do when blind blocked?
+            //sendLogMessage("Moving a head. Waza!");
+            return;
+            }
+            if (state==MOVETASK && detectFront().getObjectType()!=IFrontSensorResult.Types.NOTHING) {
+            // System.out.println("kaka");
+            // if (whoAmI== ROCKY){
+            //     state=TURNLEFTTASK;
+            //     oldAngle=getHeading();
+            //     stepTurn(Parameters.Direction.LEFT);
+            //     // tourner a  gauche de 90
+            // }else{
+            state=TURNRIGHTTASK;
+            oldAngle=getHeading();
+            stepTurn(Parameters.Direction.RIGHT);
+            //sendLogMessage("Iceberg at 12 o'clock. Heading 3!");
+            //}
+            return;
+            }
 
-    if (state==TURNRIGHTTASK && !(isSameDirection(getHeading(),oldAngle+Parameters.RIGHTTURNFULLANGLE))) {
-      stepTurn(Parameters.Direction.RIGHT);
-      //sendLogMessage("Iceberg at 12 o'clock. Heading 3!");
-      return;
-    }
-    if (state==TURNRIGHTTASK && isSameDirection(getHeading(),oldAngle+Parameters.RIGHTTURNFULLANGLE)) {
-      state=MOVETASK;
-      myMove();
-      //sendLogMessage("Moving a head. Waza!");
-      return;
-    }
-    
-    
+            if (state==TURNRIGHTTASK && !(isSameDirection(getHeading(),oldAngle+Parameters.RIGHTTURNFULLANGLE))) {
+            stepTurn(Parameters.Direction.RIGHT);
+            //sendLogMessage("Iceberg at 12 o'clock. Heading 3!");
+            return;
+            }
+            if (state==TURNRIGHTTASK && isSameDirection(getHeading(),oldAngle+Parameters.RIGHTTURNFULLANGLE)) {
+            state=MOVETASK;
+            myMove();
+            //sendLogMessage("Moving a head. Waza!");
+            return;
+            }
+
+        }
 
 
     if (state==SINK) {

@@ -149,7 +149,7 @@ public class Stage7MainB extends Brain {
             return;
         }
         if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.NORTH) && myY <= 1275 ) {
-            System.out.println(myY);
+            //System.out.println(myY);
             myMove();
             return;
         }
@@ -170,7 +170,7 @@ public class Stage7MainB extends Brain {
             return;
         }
         if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.NORTH) && myY <= 1375 ) {
-            System.out.println(myY);
+            //System.out.println(myY);
             myMove();
             return;
         }
@@ -192,7 +192,7 @@ public class Stage7MainB extends Brain {
             return;
         }
         if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.NORTH) && myY <= 1475 ) {
-            System.out.println(myY);
+            //System.out.println(myY);
             myMove();
             return;
         }
