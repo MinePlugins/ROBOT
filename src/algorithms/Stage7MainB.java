@@ -36,9 +36,11 @@ public class Stage7MainB extends Brain {
   private static final int TURNSOUTHTASK = 1;
   private static final int MOVETASK = 2;
   private static final int TURNLEFTTASK = 3;
-  private static final int MOVEBACK = 4;
+  //private static final int MOVEBACK = 4;
   private static final int MOVEAHEAD = 5;
   private static final int TAKEPLACETASK = 6;
+  private static final int TURNRIGHTTASK = 4;
+
   private static final int SINK = 0xBADC0DE1;
 
   //---VARIABLES---//
@@ -113,12 +115,14 @@ public class Stage7MainB extends Brain {
     //if (debug && fireOrder) sendLogMessage("Firing enemy!!");
 
     //COMMUNICATION
+    firePositionX_Temp = 0;
     ArrayList<String> messages=fetchAllMessages();
     for (String m: messages) if (Integer.parseInt(m.split(":")[1])==whoAmI || Integer.parseInt(m.split(":")[1])==TEAM) process(m);
     
     //RADAR DETECTION
     freeze=false;
     friendlyFire=true;
+    
     for (IRadarResult o: detectRadar()){
       if (o.getObjectType()==IRadarResult.Types.OpponentMainBot || o.getObjectType()==IRadarResult.Types.OpponentSecondaryBot) {
         double enemyX=myX+o.getObjectDistance()*Math.cos(o.getObjectDirection());
@@ -138,6 +142,63 @@ public class Stage7MainB extends Brain {
     }
     if (freeze) return;
 
+    if(whoAmI == GAMMA){
+        state = TURNLEFTTASK;
+        if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),oldAngle+Parameters.NORTH))) {
+            stepTurn(Parameters.Direction.LEFT);
+            return;
+        }
+        if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.NORTH) && myY <= 1275 ) {
+            System.out.println(myY);
+            myMove();
+            return;
+        }
+
+     }
+
+    if(whoAmI == BETA){
+        if(state == MOVEAHEAD && myX > 2730){
+            myMove();
+            return;
+        }
+        if(state == MOVEAHEAD && myX <= 2730){
+            state=TURNLEFTTASK;
+            return;
+        }
+        if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),oldAngle+Parameters.NORTH))) {
+            stepTurn(Parameters.Direction.LEFT);
+            return;
+        }
+        if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.NORTH) && myY <= 1375 ) {
+            System.out.println(myY);
+            myMove();
+            return;
+        }
+
+     }
+
+
+     if(whoAmI == ALPHA){
+        if(state == MOVEAHEAD && myX > 2670){
+            myMove();
+            return;
+        }
+        if(state == MOVEAHEAD && myX <= 2670){
+            state=TURNLEFTTASK;
+            return;
+        }
+        if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),oldAngle+Parameters.NORTH))) {
+            stepTurn(Parameters.Direction.LEFT);
+            return;
+        }
+        if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.NORTH) && myY <= 1475 ) {
+            System.out.println(myY);
+            myMove();
+            return;
+        }
+
+     }
+
     //AUTOMATON
     if (fireOrder) countDown++;
     if (countDown>=10000) fireOrder=false;
@@ -151,158 +212,7 @@ public class Stage7MainB extends Brain {
       return;
     }
     fireRythm*=15000;
-    if (fireRythm>=Parameters.bulletFiringLatency) fireRythm=150;
-    // if (state==TURNSOUTHTASK && !(isSameDirection(getHeading(),Parameters.NORTH))) {
-    //   stepTurn(Parameters.Direction.RIGHT);
-    //   return;
-    // }
-    /*
-    if (state==TURNSOUTHTASK && isSameDirection(getHeading(),Parameters.NORTH)) {
-      state=MOVETASK;
-      myMove();
-      return;
-    }
-    if (state==MOVETASK && detectFront().getObjectType()!=IFrontSensorResult.Types.WALL) {
-      myMove();
-      return;
-    }
-    if (state==MOVETASK && detectFront().getObjectType()==IFrontSensorResult.Types.WALL) {
-      state=TURNLEFTTASK;
-      oldAngle=myGetHeading();
-      stepTurn(Parameters.Direction.LEFT);
-      return;
-    }*/
-    if(whoAmI == GAMMA){
-        if(state==MOVEAHEAD && !(isSameDirection(getHeading(),Parameters.EAST))){
-            stepTurn(Parameters.Direction.LEFT);
-            return;
-        }
-
-        if(state==MOVEAHEAD && isSameDirection(getHeading(),Parameters.EAST) && myX<=2850){
-            myMove();
-            return;
-        }  
-
-        if(state == MOVEAHEAD && myX >= 2850){
-            state = TURNLEFTTASK;
-            return;
-        }
-
-        if (state==TURNLEFTTASK &&  !(isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE))) {
-            stepTurn(Parameters.Direction.RIGHT);
-            return;
-          }
-          if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE) && myY <= 1690 ) {
-            myMove();
-            return;
-          }
-    }
-
-
-
-    if(whoAmI == BETA){
-        state = MOVEBACK;
-        if (state==MOVEBACK  &&  !(isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE))) {
-            stepTurn(Parameters.Direction.LEFT);
-            return;
-          }
-          if (state==MOVEBACK  && isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE) && myY <= 1690 ) {
-            myMove();
-            return;
-          }
-
-          if(state == MOVEBACK && myY >= 1690){
-            state = TURNLEFTTASK;
-            return;
-          }
-
-          if (state==TURNLEFTTASK &&  !(isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE))) {
-            stepTurn(Parameters.Direction.RIGHT);
-            return;
-          }
-          if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE) && myY <= 1690 ) {
-            myMove();
-            return;
-          }
-
-          if(whoAmI == ALPHA){
-            if(state==MOVEAHEAD && myX >= 2700){
-                myMove();
-                return;
-            }
-        
-            if(state == MOVEAHEAD && myX<=2700){
-                state = TURNLEFTTASK;
-                return;
-            }
     
-        }
-    
-    }
-
-
-  
-
-  
-
-    //     if(state==MOVEBACK && myX >= 2850){
-    //         state = TURNSOUTHTASK;
-    //         return;
-    //     }
-
-    //     if (state==TURNSOUTHTASK && !(isSameDirection(getHeading(),Parameters.SOUTH))) {
-    //         stepTurn(Parameters.Direction.RIGHT);
-    //         return;
-    //     }
-     
-    //     if (state==TURNSOUTHTASK && isSameDirection(getHeading(),Parameters.SOUTH) && myY <= 1450) {
-    //         myMove();
-    //         return;
-    //       }
-    // }
-
-
-    // if(whoAmI == BETA){
-    //     if(state == MOVEBACK && myX > 2700){
-    //         myMove();
-    //         return;
-    //     }
-    //     if(state == MOVEBACK && myX <= 2700){
-    //         state=TURNLEFTTASK;
-    //         return;
-    //     }
-    //     if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),oldAngle+Parameters.NORTH))) {
-    //         stepTurn(Parameters.Direction.LEFT);
-    //         return;
-    //     }
-    //     if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.NORTH) && myY <= 1700 ) {  
-    //         //System.out.println(myY);
-    //         myMove();
-    //         return;
-    //     }
-
-    // }
-
-    // if(whoAmI == ALPHA){
-    //     if(state == MOVEBACK && myX > 2600){
-    //         myMove();
-    //         return;
-    //     }
-    //     if(state == MOVEBACK && myX <= 2600){
-    //         state=TURNLEFTTASK;
-    //         return;
-    //     }
-    //     if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),oldAngle+Parameters.NORTH))) {
-    //         stepTurn(Parameters.Direction.LEFT);
-    //         return;
-    //     }
-    //     if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.NORTH) && myY <= 1850 ) {
-    //         System.out.println(myY);
-    //         myMove();
-    //         return;
-    //     }
-
-    // }
 
     if (state==SINK) {
       myMove();
