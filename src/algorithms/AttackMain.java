@@ -361,17 +361,12 @@ public class AttackMain extends Brain {
       //PLACEMENT BETA
       if(whoAmI == BETA){
         if(myX <= 1500){
-          if(state==TURNTASK && !(isSameDirection(getHeading(),Parameters.EAST))){
+          if(!(isSameDirection(getHeading(),Parameters.EAST))){
             stepTurn(Parameters.Direction.LEFT);
             return;
           }
   
-          if(state==TURNTASK  && (isSameDirection(getHeading(),Parameters.EAST))){
-            state = MOVETASK;
-            return;
-          }
-  
-          if(state==MOVETASK && (isSameDirection(getHeading(),Parameters.EAST))){
+          if((isSameDirection(getHeading(),Parameters.EAST))){
             myMove();             
             return;
           }
