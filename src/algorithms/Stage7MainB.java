@@ -32,6 +32,8 @@ public class Stage7MainB extends Brain {
   private static final int TURNSOUTHTASK = 1;
   private static final int MOVETASK = 2;
   private static final int TURNLEFTTASK = 3;
+  private static final int TURNRIGHTTASK = 4;
+
   private static final int SINK = 0xBADC0DE1;
 
   //---VARIABLES---//
@@ -105,12 +107,14 @@ public class Stage7MainB extends Brain {
     if (debug && fireOrder) sendLogMessage("Firing enemy!!");
 
     //COMMUNICATION
+    firePositionX_Temp = 0;
     ArrayList<String> messages=fetchAllMessages();
     for (String m: messages) if (Integer.parseInt(m.split(":")[1])==whoAmI || Integer.parseInt(m.split(":")[1])==TEAM) process(m);
     
     //RADAR DETECTION
     freeze=false;
     friendlyFire=true;
+    
     for (IRadarResult o: detectRadar()){
       if (o.getObjectType()==IRadarResult.Types.OpponentMainBot || o.getObjectType()==IRadarResult.Types.OpponentSecondaryBot) {
         double enemyX=myX+o.getObjectDistance()*Math.cos(o.getObjectDirection());
@@ -121,7 +125,7 @@ public class Stage7MainB extends Brain {
         freeze=false;
       }
       if (o.getObjectType()==IRadarResult.Types.TeamMainBot || o.getObjectType()==IRadarResult.Types.TeamSecondaryBot /*|| o.getObjectType()==IRadarResult.Types.Wreck*/) {
-        System.out.println(onTheWay(o.getObjectDirection()));
+        // System.out.println(onTheWay(o.getObjectDirection()));
         if (fireOrder && onTheWay(o.getObjectDirection())) {
           friendlyFire=false;
           fireOrder=true;
@@ -166,11 +170,18 @@ public class Stage7MainB extends Brain {
     }*/
     if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE))) {
       stepTurn(Parameters.Direction.LEFT);
+      System.out.println(getHeading() + " | " + oldAngle + " | " + Parameters.LEFTTURNFULLANGLE);
+
       return;
     }
-    if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE) && myY <= 1690 ) {
-      // state=MOVETASK;
+    if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE) && myY <= 1850 ) {
+      // state=TURNRIGHTTASK;
+      
       myMove();
+      return;
+    }
+    if (state==TURNRIGHTTASK && !(isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE)) && myX <= 2860 && whoAmI==ALPHA) {
+      stepTurn(Parameters.Direction.LEFT);
       return;
     }
 
@@ -212,7 +223,7 @@ public class Stage7MainB extends Brain {
     if(targetX >= firePositionX_Temp && targetX >= 1500 && targetY >= 250){
       firePositionX_Temp = targetX;
       firePositionY_Temp = targetY;
-      System.out.println(firePositionX_Temp + " | " + firePositionY_Temp);
+      // System.out.println(firePositionX_Temp + " | " + firePositionY_Temp);
       if (Integer.parseInt(message.split(":")[2])==FIRE /*&& Math.abs(myX-targetX)<=700 && Math.abs(myY-targetY)<=700*/) {
         fireOrder=true;
         countDown=0;
