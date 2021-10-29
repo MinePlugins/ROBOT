@@ -11,7 +11,11 @@ import characteristics.Parameters;
 import characteristics.IFrontSensorResult;
 import characteristics.IRadarResult;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+
+import javax.swing.plaf.synth.SynthTextPaneUI;
+import javax.swing.text.html.HTMLDocument.RunElement;
 
 public class Stage7MainB extends Brain {
   //---PARAMETERS---//
@@ -32,6 +36,9 @@ public class Stage7MainB extends Brain {
   private static final int TURNSOUTHTASK = 1;
   private static final int MOVETASK = 2;
   private static final int TURNLEFTTASK = 3;
+  private static final int MOVEBACK = 4;
+  private static final int MOVEAHEAD = 5;
+  private static final int TAKEPLACETASK = 6;
   private static final int SINK = 0xBADC0DE1;
 
   //---VARIABLES---//
@@ -49,6 +56,7 @@ public class Stage7MainB extends Brain {
   private double[] firePosition_Temp = {0,0}; // x, y
   private double firePositionX_Temp = 0;
   private double firePositionY_Temp = 0;
+  private boolean takeplace = true;
 
   //---CONSTRUCTORS---//
   public Stage7MainB() { super(
@@ -76,7 +84,7 @@ public class Stage7MainB extends Brain {
     }
 
     //INIT
-    state=TURNLEFTTASK;
+    state=MOVEAHEAD;
     isMoving=false;
     fireOrder=false;
     fireRythm=150;
@@ -102,7 +110,7 @@ public class Stage7MainB extends Brain {
     if (debug && whoAmI == GAMMA && state!=SINK) {
       sendLogMessage("#GAMMA *thinks* (x,y)= ("+(int)myX+", "+(int)myY+") theta= "+(int)(myGetHeading()*180/(double)Math.PI)+"Â°. #State= "+state);
     }
-    if (debug && fireOrder) sendLogMessage("Firing enemy!!");
+    //if (debug && fireOrder) sendLogMessage("Firing enemy!!");
 
     //COMMUNICATION
     ArrayList<String> messages=fetchAllMessages();
@@ -121,7 +129,7 @@ public class Stage7MainB extends Brain {
         freeze=false;
       }
       if (o.getObjectType()==IRadarResult.Types.TeamMainBot || o.getObjectType()==IRadarResult.Types.TeamSecondaryBot /*|| o.getObjectType()==IRadarResult.Types.Wreck*/) {
-        System.out.println(onTheWay(o.getObjectDirection()));
+        //System.out.println(onTheWay(o.getObjectDirection()));
         if (fireOrder && onTheWay(o.getObjectDirection())) {
           friendlyFire=false;
           fireOrder=true;
@@ -143,11 +151,11 @@ public class Stage7MainB extends Brain {
       return;
     }
     fireRythm*=15000;
-    //if (fireRythm>=Parameters.bulletFiringLatency) fireRythm=150;
-    if (state==TURNSOUTHTASK && !(isSameDirection(getHeading(),Parameters.NORTH))) {
-      stepTurn(Parameters.Direction.RIGHT);
-      return;
-    }
+    if (fireRythm>=Parameters.bulletFiringLatency) fireRythm=150;
+    // if (state==TURNSOUTHTASK && !(isSameDirection(getHeading(),Parameters.NORTH))) {
+    //   stepTurn(Parameters.Direction.RIGHT);
+    //   return;
+    // }
     /*
     if (state==TURNSOUTHTASK && isSameDirection(getHeading(),Parameters.NORTH)) {
       state=MOVETASK;
@@ -164,15 +172,137 @@ public class Stage7MainB extends Brain {
       stepTurn(Parameters.Direction.LEFT);
       return;
     }*/
-    if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE))) {
-      stepTurn(Parameters.Direction.LEFT);
-      return;
+    if(whoAmI == GAMMA){
+        if(state==MOVEAHEAD && !(isSameDirection(getHeading(),Parameters.EAST))){
+            stepTurn(Parameters.Direction.LEFT);
+            return;
+        }
+
+        if(state==MOVEAHEAD && isSameDirection(getHeading(),Parameters.EAST) && myX<=2850){
+            myMove();
+            return;
+        }  
+
+        if(state == MOVEAHEAD && myX >= 2850){
+            state = TURNLEFTTASK;
+            return;
+        }
+
+        if (state==TURNLEFTTASK &&  !(isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE))) {
+            stepTurn(Parameters.Direction.RIGHT);
+            return;
+          }
+          if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE) && myY <= 1690 ) {
+            myMove();
+            return;
+          }
     }
-    if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE) && myY <= 1690 ) {
-      // state=MOVETASK;
-      myMove();
-      return;
+
+
+
+    if(whoAmI == BETA){
+        state = MOVEBACK;
+        if (state==MOVEBACK  &&  !(isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE))) {
+            stepTurn(Parameters.Direction.LEFT);
+            return;
+          }
+          if (state==MOVEBACK  && isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE) && myY <= 1690 ) {
+            myMove();
+            return;
+          }
+
+          if(state == MOVEBACK && myY >= 1690){
+            state = TURNLEFTTASK;
+            return;
+          }
+
+          if (state==TURNLEFTTASK &&  !(isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE))) {
+            stepTurn(Parameters.Direction.RIGHT);
+            return;
+          }
+          if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.LEFTTURNFULLANGLE) && myY <= 1690 ) {
+            myMove();
+            return;
+          }
+
+          if(whoAmI == ALPHA){
+            if(state==MOVEAHEAD && myX >= 2700){
+                myMove();
+                return;
+            }
+        
+            if(state == MOVEAHEAD && myX<=2700){
+                state = TURNLEFTTASK;
+                return;
+            }
+    
+        }
+    
     }
+
+
+  
+
+  
+
+    //     if(state==MOVEBACK && myX >= 2850){
+    //         state = TURNSOUTHTASK;
+    //         return;
+    //     }
+
+    //     if (state==TURNSOUTHTASK && !(isSameDirection(getHeading(),Parameters.SOUTH))) {
+    //         stepTurn(Parameters.Direction.RIGHT);
+    //         return;
+    //     }
+     
+    //     if (state==TURNSOUTHTASK && isSameDirection(getHeading(),Parameters.SOUTH) && myY <= 1450) {
+    //         myMove();
+    //         return;
+    //       }
+    // }
+
+
+    // if(whoAmI == BETA){
+    //     if(state == MOVEBACK && myX > 2700){
+    //         myMove();
+    //         return;
+    //     }
+    //     if(state == MOVEBACK && myX <= 2700){
+    //         state=TURNLEFTTASK;
+    //         return;
+    //     }
+    //     if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),oldAngle+Parameters.NORTH))) {
+    //         stepTurn(Parameters.Direction.LEFT);
+    //         return;
+    //     }
+    //     if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.NORTH) && myY <= 1700 ) {  
+    //         //System.out.println(myY);
+    //         myMove();
+    //         return;
+    //     }
+
+    // }
+
+    // if(whoAmI == ALPHA){
+    //     if(state == MOVEBACK && myX > 2600){
+    //         myMove();
+    //         return;
+    //     }
+    //     if(state == MOVEBACK && myX <= 2600){
+    //         state=TURNLEFTTASK;
+    //         return;
+    //     }
+    //     if (state==TURNLEFTTASK && !(isSameDirection(getHeading(),oldAngle+Parameters.NORTH))) {
+    //         stepTurn(Parameters.Direction.LEFT);
+    //         return;
+    //     }
+    //     if (state==TURNLEFTTASK && isSameDirection(getHeading(),oldAngle+Parameters.NORTH) && myY <= 1850 ) {
+    //         System.out.println(myY);
+    //         myMove();
+    //         return;
+    //     }
+
+    // }
 
     if (state==SINK) {
       myMove();
@@ -212,7 +342,7 @@ public class Stage7MainB extends Brain {
     if(targetX >= firePositionX_Temp && targetX >= 1500 && targetY >= 250){
       firePositionX_Temp = targetX;
       firePositionY_Temp = targetY;
-      System.out.println(firePositionX_Temp + " | " + firePositionY_Temp);
+      //System.out.println(firePositionX_Temp + " | " + firePositionY_Temp);
       if (Integer.parseInt(message.split(":")[2])==FIRE /*&& Math.abs(myX-targetX)<=700 && Math.abs(myY-targetY)<=700*/) {
         fireOrder=true;
         countDown=0;
@@ -222,7 +352,7 @@ public class Stage7MainB extends Brain {
     }
   }
   private void firePosition(double x, double y){
-    sendLogMessage( ""+Math.PI+Math.atan((y-myY)/(double)(x-myX)));
+    //sendLogMessage( ""+Math.PI+Math.atan((y-myY)/(double)(x-myX)));
     if (myX<=x) fire(Math.atan((y-myY)/(double)(x-myX)));
     else fire(Math.PI+Math.atan((y-myY)/(double)(x-myX)));
     return;
